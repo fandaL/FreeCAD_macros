@@ -191,13 +191,12 @@ def import_inp(file_name):
             model_definition = False
     f.close()
 
-
     msg = "\nNumber of recognized entities\n"
     msg += ("nodes  : %.f\nSEG2   : %.f\nSEG3   : %.f\nTRIA3  : %.f\nTRIA6  : %.f\nQUAD4  : %.f\nQUAD8  : %.f\n"
             "TETRA4 : %.f\nTETRA10: %.f\nHEXA8  : %.f\nHEXA20 : %.f\nPENTA6 : %.f\nPENTA15: %.f\n"
-           % (len(nodes), len(Elements.seg2), len(Elements.seg3), len(Elements.tria3), len(Elements.tria6),
-              len(Elements.quad4), len(Elements.quad8), len(Elements.tetra4), len(Elements.tetra10),
-              len(Elements.hexa8), len(Elements.hexa20), len(Elements.penta6), len(Elements.penta15)))
+            % (len(nodes), len(Elements.seg2), len(Elements.seg3), len(Elements.tria3), len(Elements.tria6),
+               len(Elements.quad4), len(Elements.quad8), len(Elements.tetra4), len(Elements.tetra10),
+               len(Elements.hexa8), len(Elements.hexa20), len(Elements.penta6), len(Elements.penta15)))
     print(msg)
     return nodes, Elements
 
@@ -246,7 +245,6 @@ def import_int_pt(file_name):
             if en_last != en:
                 if en_last:
                     von_Mises_step[time_stress][en_last] = list(von_Mises_int_pt)
-
                     von_Mises_int_pt = []
                 en_last = en
             sxx = float(line_split[2])
@@ -255,8 +253,8 @@ def import_int_pt(file_name):
             sxy = float(line_split[5])
             sxz = float(line_split[6])
             syz = float(line_split[7])
-            von_Mises_int_pt.append(math.sqrt(0.5 * ((sxx - syy) ** 2 + (syy - szz) ** 2 + (szz - sxx) ** 2 +
-                                              6 * (sxy ** 2 + syz ** 2 + sxz ** 2))))
+            von_Mises_int_pt.append(math.sqrt(0.5 * ((sxx - syy) ** 2 + (syy - szz) ** 2 + (szz - sxx) ** 2
+                                              + 6 * (sxy ** 2 + syz ** 2 + sxz ** 2))))
 
         elif read_peeq == 1:
             en = int(line_split[0])
@@ -286,10 +284,11 @@ def vtk_mesh(file_name, nodes, Elements):
 
     # nodes
     associated_nodes = set()
-    for nn_lists in list(Elements.seg2.values()) + list(Elements.seg3.values()) + list(Elements.tria3.values()) +\
-            list(Elements.tria6.values()) + list(Elements.quad4.values()) + list(Elements.quad8.values()) +\
-            list(Elements.tetra4.values()) + list(Elements.tetra10.values()) + list(Elements.penta6.values()) +\
-            list(Elements.penta15.values()) + list(Elements.hexa8.values()) + list(Elements.hexa20.values()):
+    for nn_lists in (list(Elements.seg2.values()) + list(Elements.seg3.values()) + list(Elements.tria3.values())
+                     + list(Elements.tria6.values()) + list(Elements.quad4.values()) + list(Elements.quad8.values())
+                     + list(Elements.tetra4.values()) + list(Elements.tetra10.values()) + list(Elements.penta6.values())
+                     + list(Elements.penta15.values()) + list(Elements.hexa8.values())
+                     + list(Elements.hexa20.values())):
         associated_nodes.update(nn_lists)
     associated_nodes = sorted(associated_nodes)
     # node renumbering table for vtk format which does not jump over node numbers and contains only associated nodes
@@ -309,19 +308,19 @@ def vtk_mesh(file_name, nodes, Elements):
     f.write("\n")
 
     # elements
-    number_of_elements = len(Elements.seg2) + len(Elements.seg3) + len(Elements.tria3) + len(Elements.tria6) +\
-                         len(Elements.quad4) + len(Elements.quad8) + len(Elements.tetra4) + len(Elements.tetra10) +\
-                         len(Elements.penta6) + len(Elements.penta15) + len(Elements.hexa8) + len(Elements.hexa20)
-    en_all = list(Elements.seg2.keys()) + list(Elements.seg3.keys()) + list(Elements.tria3.keys()) +\
-             list(Elements.tria6.keys()) + list(Elements.quad4.keys()) + list(Elements.quad8.keys()) +\
-             list(Elements.tetra4.keys()) + list(Elements.tetra10.keys()) + list(Elements.penta6.keys()) +\
-             list(Elements.penta15.keys()) + list(Elements.hexa8.keys()) + list(Elements.hexa20.keys())
-             # defines vtk element numbering from 0
+    number_of_elements = (len(Elements.seg2) + len(Elements.seg3) + len(Elements.tria3) + len(Elements.tria6)
+                          + len(Elements.quad4) + len(Elements.quad8) + len(Elements.tetra4) + len(Elements.tetra10)
+                          + len(Elements.penta6) + len(Elements.penta15) + len(Elements.hexa8) + len(Elements.hexa20))
+    en_all = (list(Elements.seg2.keys()) + list(Elements.seg3.keys()) + list(Elements.tria3.keys())
+              + list(Elements.tria6.keys()) + list(Elements.quad4.keys()) + list(Elements.quad8.keys())
+              + list(Elements.tetra4.keys()) + list(Elements.tetra10.keys()) + list(Elements.penta6.keys())
+              + list(Elements.penta15.keys()) + list(Elements.hexa8.keys()) + list(Elements.hexa20.keys()))
+              # defines vtk element numbering from 0
 
-    size_of_cells = 3 * len(Elements.seg2) + 4 * len(Elements.seg3) + 4 * len(Elements.tria3) +\
-                    7 * len(Elements.tria6) + 5 * len(Elements.quad4) + 9 * len(Elements.quad8) +\
-                    5 * len(Elements.tetra4) + 11 * len(Elements.tetra10) + 7 * len(Elements.penta6) +\
-                    16 * len(Elements.penta15) + 9 * len(Elements.hexa8) + 21 * len(Elements.hexa20)
+    size_of_cells = (3 * len(Elements.seg2) + 4 * len(Elements.seg3) + 4 * len(Elements.tria3)
+                     + 7 * len(Elements.tria6) + 5 * len(Elements.quad4) + 9 * len(Elements.quad8)
+                     + 5 * len(Elements.tetra4) + 11 * len(Elements.tetra10) + 7 * len(Elements.penta6)
+                     + 16 * len(Elements.penta15) + 9 * len(Elements.hexa8) + 21 * len(Elements.hexa20))
     f.write("\nCELLS " + str(number_of_elements) + " " + str(size_of_cells) + "\n")
 
     def write_elm(elm_category, node_length):
@@ -345,10 +344,10 @@ def vtk_mesh(file_name, nodes, Elements):
     write_elm(Elements.hexa20, "20")
 
     f.write("\nCELL_TYPES " + str(number_of_elements) + "\n")
-    cell_types = "3 " * len(Elements.seg2) + "21 " * len(Elements.seg3) + "5 " * len(Elements.tria3) +\
-                 "22 " * len(Elements.tria6) + "9 " * len(Elements.quad4) + "23 " * len(Elements.quad8) +\
-                 "10 " * len(Elements.tetra4) + "24 " * len(Elements.tetra10) + "13 " * len(Elements.penta6) +\
-                 "26 " * len(Elements.penta15) + "12 " * len(Elements.hexa8) + "25 " * len(Elements.hexa20)
+    cell_types = ("3 " * len(Elements.seg2) + "21 " * len(Elements.seg3) + "5 " * len(Elements.tria3)
+                  + "22 " * len(Elements.tria6) + "9 " * len(Elements.quad4) + "23 " * len(Elements.quad8)
+                  + "10 " * len(Elements.tetra4) + "24 " * len(Elements.tetra10) + "13 " * len(Elements.penta6)
+                  + "26 " * len(Elements.penta15) + "12 " * len(Elements.hexa8) + "25 " * len(Elements.hexa20))
     line_count = 0
     for char in cell_types:
         f.write(char)
